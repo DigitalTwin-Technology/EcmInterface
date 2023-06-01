@@ -22,4 +22,4 @@ In the VR application, I would like the ability to display an animation of the b
 
 - The bus animation is as smooth and realistic as possible
 - The UI notification appears promptly when a bus arrives at a parking slot
-- Users are able to easily differentiate between different parking slot types based
+- Users are able to easily differentiate between different parking slot types
