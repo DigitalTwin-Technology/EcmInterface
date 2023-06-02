@@ -15,6 +15,8 @@ namespace DigitalTwinTechnology.Editor
         SerializedProperty AnimationCurveDuration_Propierty;
         SerializedProperty AnimationCurvePointList_Propierty;
         SerializedProperty AnimationCurve_Propierty;
+        SerializedProperty CurveColor_Propierty;
+        SerializedProperty GizmoColor_Propierty;
 
         private void OnEnable()
         {
@@ -24,6 +26,8 @@ namespace DigitalTwinTechnology.Editor
             AnimationCurveDuration_Propierty = serializedObject.FindProperty("AnimationCurveDuration");
             AnimationCurve_Propierty = serializedObject.FindProperty("AnimationCurveObj");
             AnimationCurvePointList_Propierty = serializedObject.FindProperty("AnimationCurvePointList");
+            CurveColor_Propierty = serializedObject.FindProperty("CurveColor");
+            GizmoColor_Propierty = serializedObject.FindProperty("GizmoColor");
         }
 
         public override void OnInspectorGUI()
@@ -38,11 +42,11 @@ namespace DigitalTwinTechnology.Editor
 
         public void OnSceneGUI()
         {
-            for (int i = 0; i < _target.AnimationCurvePointList.Count; i++)
-            {
-                _target.AnimationCurvePointList[i] = Handles.PositionHandle(_target.AnimationCurvePointList[i], Quaternion.identity);
-                Handles.Label(_target.AnimationCurvePointList[i], "Node " + i);
-            }
+            //for (int i = 0; i < _target.AnimationCurvePointList.Count; i++)
+            //{
+            //    _target.AnimationCurvePointList[i] = Handles.PositionHandle(_target.AnimationCurvePointList[i], Quaternion.identity);
+            //    Handles.Label(_target.AnimationCurvePointList[i], "Node " + i);
+            //}
         }
 
         private void DrawCurvePointsList()
@@ -62,6 +66,9 @@ namespace DigitalTwinTechnology.Editor
                 _target.UpdateAnimationCurveLinearDuration();
             }
             if (AnimationCurve_Propierty != null) { EditorGUILayout.PropertyField(AnimationCurve_Propierty); }
+
+            if (CurveColor_Propierty != null) { EditorGUILayout.PropertyField(CurveColor_Propierty); }
+            if (GizmoColor_Propierty != null) { EditorGUILayout.PropertyField(GizmoColor_Propierty); }
         }
     }
 }

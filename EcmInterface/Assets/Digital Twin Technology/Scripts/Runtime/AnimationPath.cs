@@ -19,6 +19,7 @@ namespace DigitalTwinTechnology
         public float InitialPauseTime = 0.0f;
 
         public AnimationCurve AnimationCurveObj = new AnimationCurve();
+
         public Color CurveColor = Color.white;
         public Color GizmoColor = Color.red;
 
@@ -58,7 +59,7 @@ namespace DigitalTwinTechnology
             Gizmos.color = GizmoColor;
             for (int i = 0; i < AnimationCurvePointList.Count; i++)
             {
-                Gizmos.DrawWireCube(AnimationCurvePointList[i], Vector3.one);
+                Gizmos.DrawWireCube(AnimationCurvePointList[i], 0.5f * Vector3.one);
             }
 
             if (AnimationCurvePointList.Count > 1)

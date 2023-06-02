@@ -13,12 +13,16 @@ namespace DigitalTwinTechnology
         private float _animationTime = 0;
         private float _animationPauseTime = 0;
 
+        private Vector3 _gizmoPostion = Vector3.zero;
+
         public int CurrentAnimationCurve;
         public GameObject AnimatedObject;
         public List<AnimationPath> AnimationPathDataList = new List<AnimationPath>();
 
         public Color CurveColor = Color.white;
         public Color GizmoColor = Color.red;
+
+        public bool ShowGizmo = false;
 
         public float CurvePostion
         {
@@ -27,11 +31,16 @@ namespace DigitalTwinTechnology
             {
                 _curvePosition = Mathf.Clamp01(value);
 
-                if (AnimationPathDataList.Count >= 1 && AnimatedObject != null)
+                if (AnimationPathDataList.Count >= 1)
                 {
                     float currentCurvePosition = EvaluateCurrentCurvePostion(_curvePosition);
                     AnimationPathDataList[CurrentAnimationCurve].CurvePostion = currentCurvePosition;
-                    AnimationPathDataList[CurrentAnimationCurve].SetAnimatedObjectLocation(AnimatedObject.transform);
+
+                    if(AnimatedObject != null)
+                    {
+                        AnimationPathDataList[CurrentAnimationCurve].SetAnimatedObjectLocation(AnimatedObject.transform);
+                    }
+                    _gizmoPostion = AnimationPathDataList[CurrentAnimationCurve].PointPosition;
                 }
             }
         }
@@ -86,6 +95,14 @@ namespace DigitalTwinTechnology
                 {
                     _animationPauseTime = 0.0f;
                 }
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if(!Application.isPlaying && ShowGizmo)
+            {
+                Gizmos.DrawSphere(_gizmoPostion, 0.5f);
             }
         }
 

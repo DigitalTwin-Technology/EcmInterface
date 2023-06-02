@@ -1,6 +1,7 @@
 // Copyright (c) 2023  DigitalTwin Technology GmbH
 // https://www.digitaltwin.technology/
 
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,19 +10,20 @@ namespace DigitalTwinTechnology.Editor
     [CustomEditor(typeof(AnimationPathController))]
     public class AnimationPathControllerCustomEditor : UnityEditor.Editor
     {
-        AnimationPathController _target;
+        private AnimationPathController _target;
+        private SerializedProperty AnimatedObject_Propierty;
+        private SerializedProperty ShowGizmo_Propierty;
 
-        SerializedProperty AnimatedObject_Propierty;
-        SerializedProperty CurveColor_Propierty;
-        SerializedProperty GizmoColor_Propierty;
+        private GUIStyle style = new GUIStyle();
 
         private void OnEnable()
         {
             _target = (AnimationPathController)target;
 
             AnimatedObject_Propierty = serializedObject.FindProperty("AnimatedObject");
-            CurveColor_Propierty = serializedObject.FindProperty("CurveColor");
-            GizmoColor_Propierty = serializedObject.FindProperty("GizmoColor");
+            ShowGizmo_Propierty = serializedObject.FindProperty("ShowGizmo");
+
+            style = new GUIStyle();
         }
 
         public override void OnInspectorGUI()
@@ -36,13 +38,12 @@ namespace DigitalTwinTechnology.Editor
 
             EditorGUI.BeginChangeCheck();
             _target.CurvePostion = EditorGUILayout.Slider(_target.CurvePostion, 0.0f, 1.0f);
-            if (CurveColor_Propierty != null) { EditorGUILayout.PropertyField(CurveColor_Propierty); }
-            if (GizmoColor_Propierty != null) { EditorGUILayout.PropertyField(GizmoColor_Propierty); }
             if (EditorGUI.EndChangeCheck())
             {
-                _target.UpdateCurveColors();
                 EditorUtility.SetDirty(_target);
             }
+
+            if(ShowGizmo_Propierty != null) { EditorGUILayout.PropertyField(ShowGizmo_Propierty, new GUIContent("Show Postion Gizmo")); }
 
             if (GUILayout.Button("Add Animation Path"))
             {
@@ -55,6 +56,49 @@ namespace DigitalTwinTechnology.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        public void OnSceneGUI()
+        {
+            int prevPath;
+            int nextPath;
+            for (int iPath=0; iPath<_target.AnimationPathDataList.Count; iPath++) 
+            {
+                prevPath = -1;
+                nextPath = -1;
+
+                if (_target.AnimationPathDataList.Count > 1)
+                {
+                    prevPath = iPath == 0 ? prevPath = _target.AnimationPathDataList.Count - 1 : iPath - 1;
+                    nextPath = iPath == _target.AnimationPathDataList.Count - 1 ? nextPath = 0 : iPath + 1;
+                }
+
+                DrawCurveHandles(iPath, prevPath, nextPath);
+            }
+        }
+
+        public void DrawCurveHandles(int iCurve, int prevPath, int nextPath) 
+        {
+            style.normal.textColor = _target.AnimationPathDataList[iCurve].GizmoColor;
+            for (int i = 0; i < _target.AnimationPathDataList[iCurve].AnimationCurvePointList.Count; i++)
+            {
+                _target.AnimationPathDataList[iCurve].AnimationCurvePointList[i] = Handles.PositionHandle(_target.AnimationPathDataList[iCurve].AnimationCurvePointList[i], Quaternion.identity);
+                if (i==0 && prevPath != -1)
+                {
+                    _target.AnimationPathDataList[prevPath].AnimationCurvePointList[^1] = _target.AnimationPathDataList[iCurve].AnimationCurvePointList[i];
+                }
+
+                if (i == _target.AnimationPathDataList[iCurve].AnimationCurvePointList.Count - 1 && nextPath != -1)
+                {
+                    _target.AnimationPathDataList[nextPath].AnimationCurvePointList[0] = _target.AnimationPathDataList[iCurve].AnimationCurvePointList[i];
+                }
+
+                if (i != _target.AnimationPathDataList[iCurve].AnimationCurvePointList.Count - 1)
+                {
+                    Handles.Label(_target.AnimationPathDataList[iCurve].AnimationCurvePointList[i], 
+                        string.Format("Node({0},{1})", iCurve, i), style);
+                }
+            }
         }
     }
 }
